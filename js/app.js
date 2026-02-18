@@ -164,25 +164,70 @@
   }
 
   // ─── WORD GENERATION ──────────────────────────────────────
-  function showNextWord() {
+  async function showNextWord() {
     if (state.words.length === 0) return
 
     // Crypto-secure random index
     const randomIndex = getSecureRandom(state.words.length)
-    const { word, description } = state.words[randomIndex]
+    const entry = state.words[randomIndex]
+    const word = entry.word
 
+    // Update word text immediately
     dom.wordText.textContent = word
-    dom.wordDescription.textContent = description || ''
     dom.wordText.classList.remove('pop-in')
-    dom.wordDescription.classList.remove('pop-in')
-    // Force reflow so animation replays
     void dom.wordText.offsetWidth
     dom.wordText.classList.add('pop-in')
+
+    // Handle description (Live API for English, cached for both)
+    if (state.currentLanguage === 'EN') {
+      // If we don't have a "real" description yet (just our fallback), try the API
+      if (!entry.isRealDefinition && !entry.description.includes('Definition for')) {
+        // It might already be a real definition from our manual map, mark it
+        entry.isRealDefinition = true;
+      }
+
+      if (!entry.isRealDefinition) {
+        dom.wordDescription.textContent = 'Fetching definition...'
+        try {
+          const apiDesc = await fetchDefinition(word)
+          if (apiDesc) {
+            entry.description = apiDesc
+            entry.isRealDefinition = true
+          }
+        } catch (err) {
+          console.warn(`Could not fetch definition for ${word}`)
+        }
+      }
+    }
+
+    dom.wordDescription.textContent = entry.description || ''
+    dom.wordDescription.classList.remove('pop-in')
+    void dom.wordDescription.offsetWidth
     dom.wordDescription.classList.add('pop-in')
 
     state.wordsShown++
     dom.statWords.textContent = state.wordsShown
   }
+
+  /**
+   * Fetches definition from Free Dictionary API
+   */
+  async function fetchDefinition(word) {
+    try {
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+      if (!response.ok) return null
+      const data = await response.json()
+
+      // Navigate to first definition: data[0].meanings[0].definitions[0].definition
+      if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
+        return data[0].meanings[0].definitions[0].definition
+      }
+      return null
+    } catch (e) {
+      return null
+    }
+  }
+
 
   /**
    * Returns a cryptographically secure random integer in [0, max).
