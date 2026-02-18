@@ -10,8 +10,8 @@
   // Add new languages here. The `file` value must match a .txt file
   // inside the `data/` directory. Each line in the file = one word.
   const LANGUAGES = [
-    { code: 'AZ', label: 'Azərbaycan', file: 'AZ.txt' },
-    { code: 'EN', label: 'English', file: 'EN.txt' },
+    { code: 'AZ', label: 'Azərbaycan', file: 'AZ.json' },
+    { code: 'EN', label: 'English', file: 'EN.json' },
     // Example future additions:
     // { code: 'TR', label: 'Türkçe', file: 'TR.txt' },
     // { code: 'RU', label: 'Русский', file: 'RU.txt' },
@@ -36,6 +36,7 @@
     durationSlider: $('#duration-slider'),
     durationBadge: $('#duration-badge'),
     wordText: $('#word-text'),
+    wordDescription: $('#word-description'),
     wordHint: $('#word-hint'),
     wordCard: $('#word-card'),
     btnStart: $('#btn-start'),
@@ -94,13 +95,10 @@
     try {
       const res = await fetch(`data/${lang.file}`)
       if (!res.ok) throw new Error(`Failed to load ${lang.file}`)
-      const text = await res.text()
-      state.words = text
-        .split('\n')
-        .map((w) => w.trim())
-        .filter((w) => w.length > 0)
+      state.words = await res.json()
 
       dom.wordText.textContent = 'Ready?'
+      dom.wordDescription.textContent = ''
       dom.wordHint.textContent = `${state.words.length} words loaded · Press start`
     } catch (err) {
       console.error(err)
@@ -160,6 +158,7 @@
     resetTimerRing()
     updateUI()
     dom.wordText.textContent = 'Ready?'
+    dom.wordDescription.textContent = ''
     dom.wordHint.textContent = 'Press start to begin your flow'
     dom.timerCountdown.textContent = '–'
   }
@@ -170,13 +169,16 @@
 
     // Crypto-secure random index
     const randomIndex = getSecureRandom(state.words.length)
-    const word = state.words[randomIndex]
+    const { word, description } = state.words[randomIndex]
 
     dom.wordText.textContent = word
+    dom.wordDescription.textContent = description || ''
     dom.wordText.classList.remove('pop-in')
+    dom.wordDescription.classList.remove('pop-in')
     // Force reflow so animation replays
     void dom.wordText.offsetWidth
     dom.wordText.classList.add('pop-in')
+    dom.wordDescription.classList.add('pop-in')
 
     state.wordsShown++
     dom.statWords.textContent = state.wordsShown

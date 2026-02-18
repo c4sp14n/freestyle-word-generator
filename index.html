@@ -1,116 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Freestyle Random Word Generator</title>
-  <meta name="description" content="A random word generator for freestyle practice. Pick a language, set a timer, and start freestyling with random words!" />
-  <meta name="theme-color" content="#0a0a1a" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Freestyle Random Word Generator</title>
+    <meta name="description"
+        content="A random word generator for freestyle practice. Pick a language, set a timer, and start freestyling with random words!" />
+    <meta name="theme-color" content="#0a0a1a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
-  <!-- Animated Background Orbs -->
-  <div class="bg-orbs" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
+    <!-- Animated Background Orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
-  <main class="app" id="app">
-    <!-- Header -->
-    <header class="header">
-      <div class="logo">
-        <span class="logo-icon">🎤</span>
-        <h1 class="logo-text">Freestyle<span class="logo-accent">Flow</span></h1>
-      </div>
-      <p class="tagline">Random words. Limitless bars.</p>
-    </header>
+    <main class="app" id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🎤</span>
+                <h1 class="logo-text">Freestyle<span class="logo-accent">Flow</span></h1>
+            </div>
+            <p class="tagline">Random words. Limitless bars.</p>
+        </header>
 
-    <!-- Controls Card -->
-    <section class="card controls-card" aria-label="Controls">
-      <!-- Language Selector -->
-      <div class="control-group">
-        <label class="control-label" for="language-select">
-          <span class="label-icon">🌍</span>
-          Language
-        </label>
-        <div class="select-wrapper" id="language-select-wrapper">
-          <select id="language-select" class="select-input">
-            <!-- Options populated by JS -->
-          </select>
-          <span class="select-arrow" aria-hidden="true">▾</span>
-        </div>
-      </div>
+        <!-- Controls Card -->
+        <section class="card controls-card" aria-label="Controls">
+            <!-- Language Selector -->
+            <div class="control-group">
+                <label class="control-label" for="language-select">
+                    <span class="label-icon">🌍</span>
+                    Language
+                </label>
+                <div class="select-wrapper" id="language-select-wrapper">
+                    <select id="language-select" class="select-input">
+                        <!-- Options populated by JS -->
+                    </select>
+                    <span class="select-arrow" aria-hidden="true">▾</span>
+                </div>
+            </div>
 
-      <!-- Duration Slider -->
-      <div class="control-group">
-        <label class="control-label" for="duration-slider">
-          <span class="label-icon">⏱️</span>
-          Duration
-          <span class="duration-badge" id="duration-badge">5s</span>
-        </label>
-        <input
-          type="range"
-          id="duration-slider"
-          class="range-slider"
-          min="1"
-          max="30"
-          value="5"
-          step="1"
-        />
-        <div class="range-labels">
-          <span>1s</span>
-          <span>15s</span>
-          <span>30s</span>
-        </div>
-      </div>
-    </section>
+            <!-- Duration Slider -->
+            <div class="control-group">
+                <label class="control-label" for="duration-slider">
+                    <span class="label-icon">⏱️</span>
+                    Duration
+                    <span class="duration-badge" id="duration-badge">5s</span>
+                </label>
+                <input type="range" id="duration-slider" class="range-slider" min="1" max="30" value="5" step="1" />
+                <div class="range-labels">
+                    <span>1s</span>
+                    <span>15s</span>
+                    <span>30s</span>
+                </div>
+            </div>
+        </section>
 
-    <!-- Word Display Card -->
-    <section class="card word-card" aria-label="Word Display" id="word-card">
-      <div class="timer-ring-container" id="timer-ring-container">
-        <svg class="timer-ring" viewBox="0 0 200 200" aria-hidden="true">
-          <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
-          <circle class="timer-ring-progress" id="timer-ring-progress" cx="100" cy="100" r="90" />
-        </svg>
-        <div class="timer-inner">
-          <span class="timer-countdown" id="timer-countdown">–</span>
-        </div>
-      </div>
-      <div class="word-display" id="word-display">
-        <span class="word-text" id="word-text">Ready?</span>
-      </div>
-      <p class="word-hint" id="word-hint">Press start to begin your flow</p>
-    </section>
+        <!-- Word Display Card -->
+        <section class="card word-card" aria-label="Word Display" id="word-card">
+            <div class="timer-ring-container" id="timer-ring-container">
+                <svg class="timer-ring" viewBox="0 0 200 200" aria-hidden="true">
+                    <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
+                    <circle class="timer-ring-progress" id="timer-ring-progress" cx="100" cy="100" r="90" />
+                </svg>
+                <div class="timer-inner">
+                    <span class="timer-countdown" id="timer-countdown">–</span>
+                </div>
+            </div>
+            <div class="word-display" id="word-display">
+                <span class="word-text" id="word-text">Ready?</span>
+            </div>
+            <p class="word-description" id="word-description"></p>
+            <p class="word-hint" id="word-hint">Press start to begin your flow</p>
+        </section>
 
-    <!-- Action Button -->
-    <button class="btn-start" id="btn-start" type="button">
-      <span class="btn-icon" id="btn-icon">▶</span>
-      <span class="btn-label" id="btn-label">Start</span>
-    </button>
+        <!-- Action Button -->
+        <button class="btn-start" id="btn-start" type="button">
+            <span class="btn-icon" id="btn-icon">▶</span>
+            <span class="btn-label" id="btn-label">Start</span>
+        </button>
 
-    <!-- Stats -->
-    <section class="card stats-card" aria-label="Session Stats" id="stats-card">
-      <div class="stat">
-        <span class="stat-value" id="stat-words">0</span>
-        <span class="stat-label">Words Shown</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-value" id="stat-rounds">0</span>
-        <span class="stat-label">Rounds</span>
-      </div>
-    </section>
+        <!-- Stats -->
+        <section class="card stats-card" aria-label="Session Stats" id="stats-card">
+            <div class="stat">
+                <span class="stat-value" id="stat-words">0</span>
+                <span class="stat-label">Words Shown</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-value" id="stat-rounds">0</span>
+                <span class="stat-label">Rounds</span>
+            </div>
+        </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>Built for freestylers 🔥</p>
-    </footer>
-  </main>
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built for freestylers 🔥</p>
+        </footer>
+    </main>
 
-  <script src="js/app.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
