@@ -180,13 +180,15 @@
 
     // Handle description (Live API for English, cached for both)
     if (state.currentLanguage === 'EN') {
-      // If we don't have a "real" description yet (just our fallback), try the API
-      if (!entry.isRealDefinition && !entry.description.includes('Definition for')) {
-        // It might already be a real definition from our manual map, mark it
-        entry.isRealDefinition = true;
-      }
+      // Logic fix: Only skip fetch if we genuinely have a "real" definition from a prior fetch
+      // or if it's one of our manually added high-quality descriptions.
+      // Current placeholders start with "Term:" or "Definition for"
+      const isPlaceholder = !entry.description ||
+        entry.description.startsWith('Term:') ||
+        entry.description.startsWith('Definition for') ||
+        entry.description === '';
 
-      if (!entry.isRealDefinition) {
+      if (isPlaceholder && !entry.isRealDefinition) {
         dom.wordDescription.textContent = 'Fetching definition...'
         try {
           const apiDesc = await fetchDefinition(word)
