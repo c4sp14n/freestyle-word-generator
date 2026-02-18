@@ -11,8 +11,8 @@
   // inside the `data/` directory. Each line in the file = one word.
   const LANGUAGES = [
     { code: 'AZ', label: 'Azərbaycan', file: 'AZ.txt' },
+    { code: 'EN', label: 'English', file: 'EN.txt' },
     // Example future additions:
-    // { code: 'EN', label: 'English', file: 'EN.txt' },
     // { code: 'TR', label: 'Türkçe', file: 'TR.txt' },
     // { code: 'RU', label: 'Русский', file: 'RU.txt' },
   ]
