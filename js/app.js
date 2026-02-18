@@ -175,6 +175,11 @@
     state.isPaused = false
     clearTimer()
     resetTimerRing()
+
+    // Reset stats for the UI
+    state.wordsShown = 0
+    state.rounds = 0
+
     updateUI()
     dom.wordText.textContent = 'Ready?'
     dom.wordDescription.textContent = ''
@@ -272,6 +277,7 @@
 
   // ─── TIMER ────────────────────────────────────────────────
   function startTimer(initialMs) {
+    clearTimer() // Safety check
     state.timeRemaining = initialMs
     state.lastTick = performance.now()
 
@@ -284,19 +290,20 @@
 
       state.timeRemaining -= delta
 
-      if (state.timeRemaining <= 0) {
+      if (state.timeRemaining <= -50) { // Slight buffer to ensure 0 is seen
         showNextWord()
         state.timeRemaining = state.duration * 1000
       }
 
       // Update UI
-      const remainingSec = Math.ceil(state.timeRemaining / 1000)
+      // Use floor to ensure we see the "0" second
+      const remainingSec = Math.max(0, Math.floor(state.timeRemaining / 1000 + 0.99))
       dom.timerCountdown.textContent = remainingSec
 
       // Update ring
       const progress = 1 - (state.timeRemaining / (state.duration * 1000))
       const offset = CIRCUMFERENCE * (1 - progress)
-      dom.timerProgress.style.strokeDashoffset = Math.max(0, offset)
+      dom.timerProgress.style.strokeDashoffset = Math.min(CIRCUMFERENCE, Math.max(0, offset))
     }
 
     // Using a frequent interval for smooth animation
