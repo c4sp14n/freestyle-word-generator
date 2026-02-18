@@ -117,6 +117,12 @@
     dom.btnStart.addEventListener('click', onMainButtonClick)
     dom.languageSelect.addEventListener('change', onLanguageChange)
 
+    // Mobile-first: Tap the word card to pause/resume
+    dom.wordCard.style.cursor = 'pointer'
+    dom.wordCard.addEventListener('click', () => {
+      if (state.isRunning) togglePause()
+    })
+
     // Keyboard shortcut: Space to pause/resume
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space' && e.target === document.body) {
@@ -337,9 +343,9 @@
 
     // Hint
     if (paused) {
-      dom.wordHint.textContent = 'PAUSED · Press Space to Resume'
+      dom.wordHint.textContent = 'PAUSED · Tap or Space to Resume'
     } else if (running) {
-      dom.wordHint.textContent = `New word every ${state.duration}s · Space to Pause`
+      dom.wordHint.textContent = `New word every ${state.duration}s · Tap or Space to Pause`
     }
   }
 

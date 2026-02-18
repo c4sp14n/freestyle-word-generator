@@ -433,6 +433,11 @@ body {
   box-shadow: var(--shadow-card), var(--shadow-glow);
 }
 
+.word-card:active {
+  transform: scale(0.98);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
 /* Timer Ring */
 .timer-ring-container {
   position: relative;
