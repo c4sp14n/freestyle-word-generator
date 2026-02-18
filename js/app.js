@@ -21,9 +21,12 @@
   const state = {
     words: [],
     isRunning: false,
+    isPaused: false,
     timerId: null,
     countdownId: null,
     duration: 5,
+    timeRemaining: 0,
+    lastTick: 0,
     wordsShown: 0,
     rounds: 0,
     currentLanguage: LANGUAGES[0].code,
@@ -111,14 +114,18 @@
   // ─── EVENTS ──────────────────────────────────────────────
   function attachEvents() {
     dom.durationSlider.addEventListener('input', onDurationChange)
-    dom.btnStart.addEventListener('click', toggleRunning)
+    dom.btnStart.addEventListener('click', onMainButtonClick)
     dom.languageSelect.addEventListener('change', onLanguageChange)
 
-    // Keyboard shortcut: Space to start/stop
+    // Keyboard shortcut: Space to pause/resume
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault()
-        toggleRunning()
+        if (state.isRunning) {
+          togglePause()
+        } else {
+          startSession()
+        }
       }
     })
   }
@@ -136,31 +143,50 @@
   }
 
   // ─── SESSION CONTROL ─────────────────────────────────────
-  function toggleRunning() {
+  function onMainButtonClick() {
     if (state.words.length === 0) return
     state.isRunning ? stopSession() : startSession()
   }
 
+  function togglePause() {
+    if (!state.isRunning) return
+    state.isPaused = !state.isPaused
+
+    if (state.isPaused) {
+      clearTimer()
+    } else {
+      startTimer(state.timeRemaining)
+    }
+    updateUI()
+  }
+
   function startSession() {
     state.isRunning = true
+    state.isPaused = false
     state.rounds++
+    state.wordsShown = 0 // Reset counts for new round
     updateUI()
     showNextWord()
-    startTimer()
+    startTimer(state.duration * 1000)
   }
 
   function stopSession() {
     state.isRunning = false
-    clearInterval(state.timerId)
-    clearInterval(state.countdownId)
-    state.timerId = null
-    state.countdownId = null
+    state.isPaused = false
+    clearTimer()
     resetTimerRing()
     updateUI()
     dom.wordText.textContent = 'Ready?'
     dom.wordDescription.textContent = ''
     dom.wordHint.textContent = 'Press start to begin your flow'
     dom.timerCountdown.textContent = '–'
+  }
+
+  function clearTimer() {
+    clearInterval(state.timerId)
+    clearInterval(state.countdownId)
+    state.timerId = null
+    state.countdownId = null
   }
 
   // ─── WORD GENERATION ──────────────────────────────────────
@@ -245,31 +271,36 @@
   }
 
   // ─── TIMER ────────────────────────────────────────────────
-  function startTimer() {
-    const durationMs = state.duration * 1000
-    let startTime = performance.now()
+  function startTimer(initialMs) {
+    state.timeRemaining = initialMs
+    state.lastTick = performance.now()
 
-    // Show first countdown immediately
-    dom.timerCountdown.textContent = state.duration
+    const tick = () => {
+      if (state.isPaused) return
 
-    // Word change at each interval
-    state.timerId = setInterval(() => {
-      showNextWord()
-      startTime = performance.now()
-    }, durationMs)
+      const now = performance.now()
+      const delta = now - state.lastTick
+      state.lastTick = now
 
-    // Countdown tick (every 100ms for smooth ring)
-    state.countdownId = setInterval(() => {
-      const elapsed = performance.now() - startTime
-      const remaining = Math.max(0, durationMs - elapsed)
-      const remainingSec = Math.ceil(remaining / 1000)
+      state.timeRemaining -= delta
+
+      if (state.timeRemaining <= 0) {
+        showNextWord()
+        state.timeRemaining = state.duration * 1000
+      }
+
+      // Update UI
+      const remainingSec = Math.ceil(state.timeRemaining / 1000)
       dom.timerCountdown.textContent = remainingSec
 
       // Update ring
-      const progress = elapsed / durationMs
+      const progress = 1 - (state.timeRemaining / (state.duration * 1000))
       const offset = CIRCUMFERENCE * (1 - progress)
       dom.timerProgress.style.strokeDashoffset = Math.max(0, offset)
-    }, 50)
+    }
+
+    // Using a frequent interval for smooth animation
+    state.countdownId = setInterval(tick, 16)
   }
 
   function resetTimerRing() {
@@ -279,14 +310,16 @@
   // ─── UI UPDATE ───────────────────────────────────────────
   function updateUI() {
     const running = state.isRunning
+    const paused = state.isPaused
 
     // Button state
     dom.btnIcon.textContent = running ? '■' : '▶'
     dom.btnLabel.textContent = running ? 'Stop' : 'Start'
     dom.btnStart.classList.toggle('is-running', running)
 
-    // Card glow
-    dom.wordCard.classList.toggle('active', running)
+    // Card state
+    dom.wordCard.classList.toggle('active', running && !paused)
+    dom.wordCard.style.opacity = paused ? '0.6' : '1'
 
     // Disable controls while running
     dom.controlsCard.classList.toggle('disabled', running)
@@ -296,8 +329,10 @@
     dom.statRounds.textContent = state.rounds
 
     // Hint
-    if (running) {
-      dom.wordHint.textContent = `New word every ${state.duration}s · Press Space or Stop`
+    if (paused) {
+      dom.wordHint.textContent = 'PAUSED · Press Space to Resume'
+    } else if (running) {
+      dom.wordHint.textContent = `New word every ${state.duration}s · Space to Pause`
     }
   }
 
