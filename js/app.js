@@ -226,7 +226,7 @@
         entry.description === '';
 
       if (isPlaceholder && !entry.isRealDefinition) {
-        dom.wordDescription.textContent = 'Fetching definition...'
+        dom.wordDescription.innerHTML = '<div class="loading-spinner"></div>'
         try {
           const apiDesc = await fetchDefinition(word)
           if (apiDesc) {
